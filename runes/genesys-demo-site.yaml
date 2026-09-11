@@ -1,0 +1,131 @@
+gameskill:
+  id: genesys-demo-site
+  name: Genesys Demo Site
+  category: Apps
+  description: Demo-website til Genesys Cloud. Web messaging-widget paa alle sider, vidensbase hentet live fra Genesys Knowledge
+    API, redigerbare sider (forside, indhold, kontakt) og import af en eksisterende side, saa en kundes rigtige website kan
+    bruges som kulisse. Hele sitet kan laases bag ét kodeord, der kan aabnes i et tidsvindue foer en demo og lukker sig selv
+    igen. Egen SQLite-database, ingen eksterne afhaengigheder.
+  author: andreas
+  version: 1
+  icon: app
+  docker:
+    image: '{{NODE_IMAGE}}'
+  variables:
+  - key: APP_NAME
+    name: Appens navn
+    type: string
+    default: Genesys Demo Site
+  - key: SITE_NAME
+    name: Sitets navn
+    type: string
+    default: Demo Erhverv
+    hint: Vises i menuen og i foden. Kan aendres i admin bagefter.
+  - key: GENESYS_ENV
+    name: Genesys-region
+    type: string
+    default: prod-euc1
+    pattern: ^prod[a-z0-9-]*$
+    hint: Fx prod-euc1 (Frankfurt) eller prod-euw1 (Irland).
+  - key: GENESYS_DEPLOYMENT_ID
+    name: Messenger deployment-id
+    type: string
+    default: ''
+    pattern: ^([0-9a-fA-F-]{20,60})?$
+    hint: Valgfrit. Kan ogsaa saettes i admin under Genesys.
+  - key: NODE_IMAGE
+    name: Node-image
+    type: string
+    default: node:24-alpine
+    pattern: ^node:[0-9][A-Za-z0-9._-]*$
+    hint: Skal vaere et node:-image. node:sqlite kraever Node 22 eller nyere.
+  - key: KODE_VERSION
+    name: Kodeversion
+    type: string
+    default: ''
+    pattern: ^([0-9]+|seneste|latest)?$
+    hint: Tom = hent nyeste udgivelse fra GitHub ved hver genstart. Et tal (fx 3) laaser til praecis den udgave - brug det
+      til at fryse sitet dagen foer en stor demo.
+  install:
+    image: '{{NODE_IMAGE}}'
+    script: "set -eu\necho \"Installerer Genesys Demo Site (startsnor v1) ...\"\necho \"Node: $(node --version)\"\n\necho\
+      \ \"Henter app-koden fra GitHub ...\"\n\n# Der pakkes ud VED SIDEN AF app/, ikke i /tmp: et bytte skal kunne\n# ske\
+      \ med to rename inden for samme filsystem.\nrm -rf .gds-ny .gds-gammel\nmkdir -p .gds-ny\nnode -e 'const https=require(\"\
+      https\"),zlib=require(\"zlib\");const U=\"https://codeload.github.com/andreasdinesen/genesys-demo-site/tar.gz/refs/tags/v1\"\
+      ;function d(m){console.error(\"[fejl] \"+m);console.error(\"Adresse: \"+U);console.error(\"GitHub svarer 404 BAADE naar\
+      \ adressen ikke findes OG naar der ikke er adgang - tjek at taggen er pushet, og at repoet er offentligt.\");process.exit(1);}function\
+      \ hent(u,n){https.get(u,{headers:{\"user-agent\":\"genesys-demo-site-installer\"}},(r)=>{if(r.statusCode>=300&&r.statusCode<400&&r.headers.location){if(n<=0)return\
+      \ d(\"for mange omdirigeringer\");r.resume();return hent(new URL(r.headers.location,u).toString(),n-1);}if(r.statusCode!==200)return\
+      \ d(\"GitHub svarede \"+r.statusCode);const g=zlib.createGunzip();g.on(\"error\",(e)=>d(\"arkivet kunne ikke pakkes\
+      \ ud: \"+e.message));r.pipe(g).pipe(process.stdout);}).on(\"error\",(e)=>d(\"kunne ikke naa GitHub: \"+e.message));}hent(U,3);'\
+      \ > .gds-ny/app.tar\ntar x -C .gds-ny -f .gds-ny/app.tar\nrm -f .gds-ny/app.tar\n\n# Mappenavnet i et GitHub-arkiv er\
+      \ <repo>-<ref uden v>, og arkivet\n# begynder med en pax_global_header-post. Ingen af delene gaettes:\n# find den app-mappe,\
+      \ der FINDES.\nNY=$(find .gds-ny -maxdepth 2 -type d -name app | head -n 1)\nif [ -z \"$NY\" ] || [ ! -f \"$NY/server.js\"\
+      \ ]; then\n  echo \"[fejl] arkivet fra GitHub indeholder ingen app/server.js\"\n  exit 1\nfi\n\n# To omdoebninger, ingen\
+      \ kopi. Doer vi mellem dem, ligger den gamle\n# app under .gds-gammel, og startup-kommandoen saetter den tilbage.\n\
+      if [ -d app ]; then mv app .gds-gammel; fi\nmv \"$NY\" app\nrm -rf .gds-ny .gds-gammel\n\necho \"Filer udpakket:\"\n\
+      ls -1 app app/public\necho \"Klar. Start serveren i panelet - den henter selv nyeste udgave\"\necho \"(eller den, KODE_VERSION\
+      \ laaser til), foer den starter.\"\n"
+  update:
+    image: '{{NODE_IMAGE}}'
+    label: Opdater demo-sitet
+    script: "set -eu\necho \"Opdaterer Genesys Demo Site ...\"\necho \"Node: $(node --version)\"\n\nif ! mkdir .gds-laas 2>/dev/null;\
+      \ then\n  echo \"[fejl] en anden opdatering er allerede i gang.\"\n  echo \"Vent til den er faerdig, eller genstart\
+      \ demo-sitet og proev igen.\"\n  exit 1\nfi\ntrap 'rm -rf .gds-laas .gds-ny' EXIT INT TERM\n\nif [ -f app/kilde.js ];\
+      \ then\n  K=\"{{KODE_VERSION}}\"\n  case \"$K\" in\n    '') : ;;\n    seneste|latest|[0-9]*) : ;;\n    *) K=\"${KODE_VERSION:-}\"\
+      \ ;;\n  esac\n  echo \"Oensket udgave: ${K:-nyeste}\"\n  KODE_VERSION=\"$K\" node app/kilde.js\nelse\n  echo \"Henter\
+      \ app-koden fra GitHub ...\"\n\n  # Der pakkes ud VED SIDEN AF app/, ikke i /tmp: et bytte skal kunne\n  # ske med to\
+      \ rename inden for samme filsystem.\n  rm -rf .gds-ny .gds-gammel\n  mkdir -p .gds-ny\n  node -e 'const https=require(\"\
+      https\"),zlib=require(\"zlib\");const U=\"https://codeload.github.com/andreasdinesen/genesys-demo-site/tar.gz/refs/tags/v1\"\
+      ;function d(m){console.error(\"[fejl] \"+m);console.error(\"Adresse: \"+U);console.error(\"GitHub svarer 404 BAADE naar\
+      \ adressen ikke findes OG naar der ikke er adgang - tjek at taggen er pushet, og at repoet er offentligt.\");process.exit(1);}function\
+      \ hent(u,n){https.get(u,{headers:{\"user-agent\":\"genesys-demo-site-installer\"}},(r)=>{if(r.statusCode>=300&&r.statusCode<400&&r.headers.location){if(n<=0)return\
+      \ d(\"for mange omdirigeringer\");r.resume();return hent(new URL(r.headers.location,u).toString(),n-1);}if(r.statusCode!==200)return\
+      \ d(\"GitHub svarede \"+r.statusCode);const g=zlib.createGunzip();g.on(\"error\",(e)=>d(\"arkivet kunne ikke pakkes\
+      \ ud: \"+e.message));r.pipe(g).pipe(process.stdout);}).on(\"error\",(e)=>d(\"kunne ikke naa GitHub: \"+e.message));}hent(U,3);'\
+      \ > .gds-ny/app.tar\n  tar x -C .gds-ny -f .gds-ny/app.tar\n  rm -f .gds-ny/app.tar\n\n  # Mappenavnet i et GitHub-arkiv\
+      \ er <repo>-<ref uden v>, og arkivet\n  # begynder med en pax_global_header-post. Ingen af delene gaettes:\n  # find\
+      \ den app-mappe, der FINDES.\n  NY=$(find .gds-ny -maxdepth 2 -type d -name app | head -n 1)\n  if [ -z \"$NY\" ] ||\
+      \ [ ! -f \"$NY/server.js\" ]; then\n    echo \"[fejl] arkivet fra GitHub indeholder ingen app/server.js\"\n    exit\
+      \ 1\n  fi\n\n  # To omdoebninger, ingen kopi. Doer vi mellem dem, ligger den gamle\n  # app under .gds-gammel, og startup-kommandoen\
+      \ saetter den tilbage.\n  if [ -d app ]; then mv app .gds-gammel; fi\n  mv \"$NY\" app\n  rm -rf .gds-ny .gds-gammel\n\
+      fi\n\necho \"App-filerne er skiftet ud. Databasen i /data er uroert.\"\necho \"Panelet genstarter appen bagefter. Sker\
+      \ det ikke, saa genstart\"\necho \"selv - serveren koerer den gamle kode, til den er genstartet.\"\n"
+  startup:
+    command: "if [ ! -f app/server.js ] && [ -f .gds-gammel/server.js ]; then\n  rm -rf app\n  mv .gds-gammel app\n  echo\
+      \ \"[kode] app/ sat tilbage efter en afbrudt udskiftning\"\nfi\nif [ -d .gds-laas ]; then\n  rm -rf .gds-laas .gds-ny\n\
+      \  echo \"[kode] en strandet opdateringslaas er ryddet\"\nfi\nnode app/kilde.js || echo \"[kode] advarsel: opdateringen\
+      \ kunne ikke koeres\"\nif node -e \"require('node:sqlite')\" >/dev/null 2>&1; then\n  exec node app/server.js\nelse\n\
+      \  exec node --experimental-sqlite app/server.js\nfi\n"
+    done_regex: lytter p\S+ port \d+
+    stop_timeout: 20
+  ports:
+  - name: web
+    default: 3000
+    protocol: tcp
+  watchers:
+  - name: Serverfejl i demo-sitet
+    pattern: \[fejl\]
+    threshold: 5
+    window_secs: 300
+  events:
+  - key: gds_admin_login_fejl
+    label: Mislykket admin-login
+    match: \[sikkerhed\] login-fejl ip=(\S+)
+  - key: gds_admin_spaerret
+    label: Admin-login spaerret af rate-limit
+    match: \[sikkerhed\] login-spaerret ip=(\S+)
+  - key: gds_laas_fejl
+    label: Forkert kodeord til sitet
+    match: \[sikkerhed\] laas-fejl ip=(\S+)
+  - key: gds_laas_spaerret
+    label: Sitets laas spaerret af rate-limit
+    match: \[sikkerhed\] laas-spaerret ip=(\S+)
+  backup:
+    include: []
+  wipe:
+    paths:
+    - demosite.db
+    - demosite.db-wal
+    - demosite.db-shm
+    backup_first: true

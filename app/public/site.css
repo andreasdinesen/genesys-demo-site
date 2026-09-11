@@ -1,0 +1,231 @@
+/*
+ * Demo-sitets udseende. Ét ark, ingen bygger, ingen webfont udefra.
+ *
+ * Farverne kommer fra --maerke*, som serveren stempler i <head> ud fra
+ * indstillingerne. Alt andet herinde er neutralt, saa det samme ark kan baere
+ * en blaa, en groen eller en sort kunde uden en eneste ekstra linje.
+ *
+ * Mobilgraensen er 900 px ÉT sted (RUNE-ERFARINGER §4): den staar her og i
+ * site.js, og de to skal foelges ad.
+ */
+
+:root {
+  --maerke: #0000bf;
+  --maerke-moerk: #000080;
+  --maerke-tekst: #ffffff;
+  --blaek: #14161a;
+  --daemp: #5b6472;
+  --linje: #e3e6ea;
+  --flade: #ffffff;
+  --tone: #f5f7fa;
+  --r: 10px;
+  --skygge: 0 1px 2px rgba(16, 24, 40, .06), 0 8px 24px rgba(16, 24, 40, .06);
+  --bredde: 1180px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--flade);
+  color: var(--blaek);
+  font: 400 17px/1.6 "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* Lange, ubrudte ord fra importeret indhold er den hyppigste grund til, at
+   * en side pludselig kan rulles sidelaens paa en telefon. */
+  overflow-wrap: break-word;
+}
+
+a { color: var(--maerke); }
+img { max-width: 100%; height: auto; }
+
+.indeni { width: min(100% - 40px, var(--bredde)); margin: 0 auto; }
+.indeni.smal { width: min(100% - 40px, 760px); }
+
+h1 { font-size: clamp(2rem, 1.3rem + 2.6vw, 3.2rem); line-height: 1.12; letter-spacing: -.02em; margin: 0 0 .4em; }
+h2 { font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem); line-height: 1.2; margin: 2.2rem 0 1rem; }
+h3 { font-size: 1.15rem; margin: 0 0 .4rem; }
+p { margin: 0 0 1rem; }
+
+/* ------------------------------------------------------------------ knapper */
+
+.knap {
+  display: inline-block; padding: 12px 24px; border: 0; border-radius: 999px;
+  background: var(--maerke); color: var(--maerke-tekst); font: inherit; font-weight: 600;
+  text-decoration: none; cursor: pointer; transition: filter .15s;
+}
+.knap:hover { filter: brightness(1.12); }
+.knap-lys { background: var(--flade); color: var(--maerke); border: 1px solid var(--linje); }
+.knap-linje { background: transparent; color: var(--maerke); border: 2px solid var(--maerke); }
+
+/* ------------------------------------------------------------------- toppen */
+
+.top { position: sticky; top: 0; z-index: 40; background: var(--flade); border-bottom: 1px solid var(--linje); }
+.baand { background: var(--maerke); color: var(--maerke-tekst); font-size: 13px; padding: 6px 20px; text-align: center; }
+.baand:empty { display: none; }
+.topindhold {
+  width: min(100% - 40px, var(--bredde)); margin: 0 auto;
+  display: flex; align-items: center; gap: 28px; min-height: 68px;
+}
+.logo { display: flex; align-items: center; text-decoration: none; color: var(--blaek); }
+.logo-billede { max-height: 34px; width: auto; }
+.logo-tekst { font-weight: 700; font-size: 1.25rem; letter-spacing: -.01em; }
+.hovedmenu { flex: 1; }
+.hovedmenu ul, .mobilmenu ul, .fodmenu { list-style: none; margin: 0; padding: 0; }
+.hovedmenu ul { display: flex; gap: 22px; }
+.hovedmenu a {
+  color: var(--blaek); text-decoration: none; font-size: 15px; font-weight: 500;
+  padding: 22px 0; display: inline-block; border-bottom: 3px solid transparent;
+}
+.hovedmenu a:hover { color: var(--maerke); }
+/* Understregningen tegnes ALTID - gennemsigtig naar den ikke er valgt. Ellers
+ * hopper menuen en pixel, hver gang man skifter side. */
+.hovedmenu a.aktiv { color: var(--maerke); border-bottom-color: var(--maerke); }
+.topknapper { display: flex; align-items: center; gap: 12px; }
+.topknapper .knap { padding: 9px 18px; font-size: 15px; }
+.menuknap { display: none; border: 1px solid var(--linje); background: var(--flade); color: var(--blaek);
+  border-radius: var(--r); padding: 9px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+.mobilmenu { border-top: 1px solid var(--linje); padding: 8px 20px 16px; }
+.mobilmenu a { display: block; padding: 12px 0; color: var(--blaek); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--linje); }
+
+/* --------------------------------------------------------------------- hero */
+
+.hero {
+  background: linear-gradient(120deg, var(--maerke) 0%, var(--maerke-moerk) 100%);
+  color: var(--maerke-tekst); padding: clamp(48px, 7vw, 96px) 0;
+  background-size: cover; background-position: center;
+}
+.hero[style*="--hero-billede"] { background-image: linear-gradient(90deg, rgba(0, 0, 0, .62), rgba(0, 0, 0, .15)), var(--hero-billede); }
+.hero .indeni { max-width: 760px; margin-inline: auto; margin-left: max(20px, calc((100% - var(--bredde)) / 2)); }
+.hero h1 { margin-bottom: .3em; }
+.hero-tekst { font-size: 1.15rem; opacity: .95; }
+.hero .knap { background: var(--flade); color: var(--maerke); margin-top: 12px; }
+.overrubrik { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 700; opacity: .85; margin: 0 0 .6em; }
+
+.sidetop { padding: clamp(36px, 5vw, 64px) 0 8px; }
+.sidetop-kb { background: var(--tone); padding-bottom: clamp(28px, 4vw, 48px); }
+.manchet { font-size: 1.15rem; color: var(--daemp); max-width: 70ch; }
+
+/* ------------------------------------------------------------------- blokke */
+
+.blok { padding: clamp(28px, 4vw, 56px) 0; }
+.blok.tonet { background: var(--tone); }
+.blok > .indeni > h2:first-child { margin-top: 0; }
+
+.kortgitter { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+.kolonner-1 { grid-template-columns: 1fr; }
+.kolonner-2 { grid-template-columns: repeat(2, 1fr); }
+.kolonner-3 { grid-template-columns: repeat(3, 1fr); }
+.kolonner-4 { grid-template-columns: repeat(4, 1fr); }
+
+.kort {
+  display: block; background: var(--flade); border: 1px solid var(--linje);
+  border-radius: var(--r); padding: 22px; box-shadow: var(--skygge);
+  color: inherit; text-decoration: none; height: 100%;
+}
+a.kort { transition: transform .15s, box-shadow .15s; }
+a.kort:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(16, 24, 40, .09), 0 18px 40px rgba(16, 24, 40, .1); }
+.kort p { color: var(--daemp); margin-bottom: .5rem; }
+.kort .overrubrik { color: var(--maerke); opacity: 1; }
+.kortbillede { border-radius: 8px; margin-bottom: 14px; display: block; }
+.kortlink { color: var(--maerke); font-weight: 600; margin: 0; }
+
+/* -------------------------------------------------------------- vidensbasen */
+
+.kbsoeg { display: flex; gap: 10px; max-width: 640px; margin-top: 20px; }
+.kbsoeg input {
+  flex: 1; padding: 13px 16px; border: 1px solid var(--linje); border-radius: 999px;
+  font: inherit; background: var(--flade); min-width: 0;
+}
+.kategorier, .artikelliste { list-style: none; margin: 0 0 8px; padding: 0; }
+.kategorier { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.kategori { display: flex; flex-direction: column; gap: 6px; }
+.kategorinavn { font-weight: 700; font-size: 1.05rem; }
+.kategoritekst, .artikelresume { color: var(--daemp); font-size: 15px; }
+.kategoriantal { color: var(--maerke); font-size: 14px; font-weight: 600; margin-top: auto; }
+.artikelliste li { border-bottom: 1px solid var(--linje); }
+.artikelliste a { display: flex; flex-direction: column; gap: 4px; padding: 18px 0; text-decoration: none; color: inherit; }
+.artikelliste a:hover .artikeltitel { color: var(--maerke); text-decoration: underline; }
+.artikeltitel { font-weight: 600; font-size: 1.08rem; }
+.maerkat { align-self: flex-start; font-size: 12px; font-weight: 600; color: var(--maerke); background: var(--tone); border-radius: 999px; padding: 3px 10px; }
+.tom, .advarsel { color: var(--daemp); }
+.advarsel { background: #fff7e6; border: 1px solid #ffe1a8; border-radius: var(--r); padding: 10px 14px; display: inline-block; }
+.fejl { color: #b3261e; }
+.brodkrumme { color: var(--daemp); font-size: 14px; }
+.artikelmeta { color: var(--daemp); font-size: 14px; margin-top: -.6em; }
+.tilbage { margin-top: 2.5rem; }
+
+/* Artiklens eget indhold - klasserne kommer fra kb.js */
+.kbindhold { font-size: 1.05rem; }
+.kbindhold h2 { font-size: 1.5rem; }
+.kbindhold h3 { font-size: 1.2rem; margin-top: 1.6rem; }
+.kb-liste { padding-left: 1.4em; }
+.kb-liste li { margin-bottom: .4em; }
+.kb-billede { margin: 1.4rem 0; }
+.kb-billede img { border-radius: var(--r); }
+.kb-center { text-align: center; }
+.kb-right { text-align: right; }
+.kb-justify { text-align: justify; }
+.kb-pre { background: var(--tone); border-radius: var(--r); padding: 14px 16px; overflow-x: auto; font-size: 15px; }
+.kb-video { width: 100%; border-radius: var(--r); }
+/* Brede tabeller ruller i deres EGEN boks - aldrig hele siden (§4). */
+.kb-tabelboks { overflow-x: auto; margin: 1.2rem 0; }
+.kb-tabel { border-collapse: collapse; width: 100%; font-size: 15px; }
+.kb-tabel th, .kb-tabel td { border: 1px solid var(--linje); padding: 10px 12px; text-align: left; vertical-align: top; }
+.kb-tabel th { background: var(--tone); }
+
+.kb-traefliste { list-style: none; margin: 0; padding: 0; }
+.kb-status { color: var(--daemp); margin-bottom: 8px; }
+
+/* ------------------------------------------------------------------ kontakt */
+
+.kontakt { display: grid; gap: 24px; grid-template-columns: 3fr 2fr; align-items: start; }
+.kontaktform { display: flex; flex-direction: column; gap: 14px; }
+.kontaktform label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 15px; }
+.kontaktform input, .kontaktform textarea {
+  padding: 11px 14px; border: 1px solid var(--linje); border-radius: 8px; font: inherit; background: var(--flade);
+  min-width: 0; width: 100%;
+}
+.kontaktform .knap { align-self: flex-start; }
+.demo-note { color: var(--daemp); font-size: 14px; margin: 0; }
+.kontaktliste { list-style: none; margin: 0; padding: 0; }
+.kontaktliste li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--linje); }
+.kontaktliste span { color: var(--daemp); }
+
+/* -------------------------------------------------------------------- foden */
+
+.fod { background: #10131a; color: #c9ced8; margin-top: 40px; padding: 44px 0 22px; }
+.fodindhold { width: min(100% - 40px, var(--bredde)); margin: 0 auto; display: flex; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+.fodnavn { color: #fff; font-weight: 700; font-size: 1.1rem; margin-bottom: .2em; }
+.fodtekst { max-width: 42ch; }
+.fodmenu { display: flex; flex-wrap: wrap; gap: 18px; }
+.fod a { color: #c9ced8; text-decoration: none; }
+.fod a:hover { color: #fff; text-decoration: underline; }
+.fodbund { width: min(100% - 40px, var(--bredde)); margin: 26px auto 0; padding-top: 16px; border-top: 1px solid #262b35; font-size: 14px; }
+
+/* ---------------------------------------------------------------- laasesiden */
+
+.laaseside { display: grid; min-height: 100vh; place-items: center; background: var(--tone); }
+.laas { width: min(100% - 40px, 420px); }
+.laasekort { display: flex; flex-direction: column; gap: 14px; padding: 30px; }
+.laasekort h1 { font-size: 1.6rem; margin: 0; }
+.laasekort label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 15px; }
+.laasekort input { padding: 11px 14px; border: 1px solid var(--linje); border-radius: 8px; font: inherit; }
+
+/* -------------------------------------------------------------------- mobil */
+
+@media (max-width: 900px) {
+  .hovedmenu { display: none; }
+  .menuknap { display: inline-flex; }
+  .topindhold { min-height: 60px; }
+  .topknapper .knap { display: none; }
+  .kolonner-2, .kolonner-3, .kolonner-4 { grid-template-columns: 1fr; }
+  .kontakt { grid-template-columns: 1fr; }
+  /* Nettet mod vandret rulning - kun under mobilgraensen, saa layoutbrud
+   * forbliver synlige paa desktop under udvikling (§4). */
+  html, body { overflow-x: hidden; }
+}
+@media (min-width: 901px) {
+  .mobilmenu { display: none !important; }
+}

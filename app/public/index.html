@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genesys Demo Site · admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/icon-192.png">
+<link rel="stylesheet" href="/style.css?v=1">
+<script data-theme-init>
+  /* Temaet saettes FOER foerste paint - ellers blinker admin hvidt paa vej ind
+     i det moerke tema. */
+  (function () {
+    try {
+      var t = localStorage.getItem('gds_tema') || 'auto';
+      document.documentElement.dataset.theme = t === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : t;
+    } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+  }());
+</script>
+</head>
+<body>
+<div id="app"><p class="daemp indlaeser">Henter …</p></div>
+<script src="/app.js?v=1"></script>
+</body>
+</html>
