@@ -43,8 +43,14 @@ ROD = os.path.dirname(os.path.abspath(__file__))
 #
 # RUNE_VERSION er ogsaa den tag, install-scriptet henter FOERSTE gang, saa
 # taggen `v<RUNE_VERSION>` SKAL vaere pushet - ellers kan runen ikke installeres
-# forfra. Derfor foelges de to tal ad ved udgivelse.
-RUNE_VERSION = None   # udfyldes af APP_VERSION nedenfor
+# forfra.
+#
+# Til og med v3 blev den sat til APP_VERSION ved hvert build - saa kom der en ny
+# rune i panelet ved hver udgivelse, selv naar YAML'en var den samme, og hele
+# pointen med at serveren henter sin egen kode var tabt. Nu staar den fast og
+# bumpes KUN, naar YAML'en selv aendrer sig. Den maa aldrig vaere nyere end
+# APP_VERSION: saa pegede install-scriptet paa en tag, der ikke findes.
+RUNE_VERSION = 3
 
 
 def fejl(besked):
@@ -494,8 +500,15 @@ def main():
             fejl(f'{navn} mangler')
     tjek_kilder(filer)
     tjek_requires([f for f in filer if f.endswith('.js') and '/parts/' not in f])
+    if RUNE_VERSION > version:
+        fejl(f'RUNE_VERSION ({RUNE_VERSION}) er nyere end APP_VERSION ({version}) - '
+             'startsnoren ville pege paa en tag, der ikke findes')
     tjek_git(version)
-    byg_yaml(version)
+    byg_yaml(RUNE_VERSION)
+    if RUNE_VERSION == version:
+        print(f'  RUNE_VERSION er ogsaa {version} denne gang - runen skal genindlaeses i panelet.')
+    else:
+        print(f'  Runen er UAENDRET paa v{RUNE_VERSION} - en genstart henter app v{version}.')
     print('Faerdig.')
 
 
