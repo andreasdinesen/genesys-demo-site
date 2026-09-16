@@ -7,7 +7,7 @@ gameskill:
     bruges som kulisse. Hele sitet kan laases bag ét kodeord, der kan aabnes i et tidsvindue foer en demo og lukker sig selv
     igen. Egen SQLite-database, ingen eksterne afhaengigheder.
   author: andreas
-  version: 1
+  version: 2
   icon: app
   docker:
     image: '{{NODE_IMAGE}}'
@@ -48,10 +48,10 @@ gameskill:
       til at fryse sitet dagen foer en stor demo.
   install:
     image: '{{NODE_IMAGE}}'
-    script: "set -eu\necho \"Installerer Genesys Demo Site (startsnor v1) ...\"\necho \"Node: $(node --version)\"\n\necho\
+    script: "set -eu\necho \"Installerer Genesys Demo Site (startsnor v2) ...\"\necho \"Node: $(node --version)\"\n\necho\
       \ \"Henter app-koden fra GitHub ...\"\n\n# Der pakkes ud VED SIDEN AF app/, ikke i /tmp: et bytte skal kunne\n# ske\
       \ med to rename inden for samme filsystem.\nrm -rf .gds-ny .gds-gammel\nmkdir -p .gds-ny\nnode -e 'const https=require(\"\
-      https\"),zlib=require(\"zlib\");const U=\"https://codeload.github.com/andreasdinesen/genesys-demo-site/tar.gz/refs/tags/v1\"\
+      https\"),zlib=require(\"zlib\");const U=\"https://codeload.github.com/andreasdinesen/genesys-demo-site/tar.gz/refs/tags/v2\"\
       ;function d(m){console.error(\"[fejl] \"+m);console.error(\"Adresse: \"+U);console.error(\"GitHub svarer 404 BAADE naar\
       \ adressen ikke findes OG naar der ikke er adgang - tjek at taggen er pushet, og at repoet er offentligt.\");process.exit(1);}function\
       \ hent(u,n){https.get(u,{headers:{\"user-agent\":\"genesys-demo-site-installer\"}},(r)=>{if(r.statusCode>=300&&r.statusCode<400&&r.headers.location){if(n<=0)return\
@@ -76,7 +76,7 @@ gameskill:
       \ ;;\n  esac\n  echo \"Oensket udgave: ${K:-nyeste}\"\n  KODE_VERSION=\"$K\" node app/kilde.js\nelse\n  echo \"Henter\
       \ app-koden fra GitHub ...\"\n\n  # Der pakkes ud VED SIDEN AF app/, ikke i /tmp: et bytte skal kunne\n  # ske med to\
       \ rename inden for samme filsystem.\n  rm -rf .gds-ny .gds-gammel\n  mkdir -p .gds-ny\n  node -e 'const https=require(\"\
-      https\"),zlib=require(\"zlib\");const U=\"https://codeload.github.com/andreasdinesen/genesys-demo-site/tar.gz/refs/tags/v1\"\
+      https\"),zlib=require(\"zlib\");const U=\"https://codeload.github.com/andreasdinesen/genesys-demo-site/tar.gz/refs/tags/v2\"\
       ;function d(m){console.error(\"[fejl] \"+m);console.error(\"Adresse: \"+U);console.error(\"GitHub svarer 404 BAADE naar\
       \ adressen ikke findes OG naar der ikke er adgang - tjek at taggen er pushet, og at repoet er offentligt.\");process.exit(1);}function\
       \ hent(u,n){https.get(u,{headers:{\"user-agent\":\"genesys-demo-site-installer\"}},(r)=>{if(r.statusCode>=300&&r.statusCode<400&&r.headers.location){if(n<=0)return\

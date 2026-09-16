@@ -151,4 +151,5 @@ Taggen `vN` **skal** være pushet – det er den, install-scriptet henter.
 
 | Version | Ændring |
 |---|---|
+| 2 | Søgningen i vidensbasen har et loft på 30 søgninger i minuttet pr. besøgende, så sitet ikke kan bruges som åben proxy ind i Genesys Knowledge-API'et, mens gaten står åben under en demo. Over loftet får man en dansk besked om at vente et minut; en almindelig demo mærker intet. |
 | 1 | Første udgave: sider (forside, indhold, vidensbase, kontakt, importeret HTML), Web Messaging-snippet, vidensbase fra Genesys Knowledge API, lås med tidsvindue, admin med udseende/Genesys/adgang, import af fremmed side, eksport og import af opsætningen. |

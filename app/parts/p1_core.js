@@ -10,7 +10,7 @@
 
 'use strict';
 
-const APP_VERSION = 1;
+const APP_VERSION = 2;
 
 /* Al tilstand ét sted. `data` er svaret fra /api/admin/data - den er
  * sandheden, og alt tegnes ud fra den. */

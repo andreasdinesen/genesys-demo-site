@@ -329,6 +329,29 @@ function notérForsoeg(noegle) {
   liste.push(Date.now());
   forsoeg.set(noegle, liste);
 }
+/* Loft over vidensbase-soegningen. Laasen er ikke en ratebegraensning: under en
+ * demo staar sitet aabent, og saa er /api/kb/soeg en ulogget vej ind i
+ * organisationens Genesys Knowledge-API - og soegningen caches med vilje ikke.
+ * 30 pr. minut pr. IP er langt over, hvad én ivrig demonstrant taster, men
+ * stopper en loekke. Egen tavle, saa soegninger aldrig spaerrer et login. */
+const KB_SOEG_LOFT = 30;
+const KB_SOEG_VINDUE = 60e3;
+const soegninger = new Map();
+function soegningOverLoft(noegle) {
+  const nu = Date.now();
+  const liste = (soegninger.get(noegle) || []).filter((t) => nu - t < KB_SOEG_VINDUE);
+  if (liste.length >= KB_SOEG_LOFT) { soegninger.set(noegle, liste); return true; }
+  liste.push(nu);
+  soegninger.set(noegle, liste);
+  return false;
+}
+/* Tavlen ryddes jaevnligt, ellers vokser den med hver IP, der nogensinde har soegt. */
+setInterval(() => {
+  const nu = Date.now();
+  for (const [k, liste] of soegninger) {
+    if (!liste.some((t) => nu - t < KB_SOEG_VINDUE)) soegninger.delete(k);
+  }
+}, 5 * 60e3).unref();
 function ip(req) {
   return String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()
     || req.socket.remoteAddress || 'ukendt';
@@ -638,6 +661,11 @@ async function kbApi(req, res, u, p) {
   if (!laasOk(req)) return fejl(res, 401, 'Siden er låst');
   if (req.method !== 'GET') return fejl(res, 405, 'Metoden er ikke tilladt');
   if (p === '/api/kb/soeg') {
+    if (soegningOverLoft(`kbsoeg:${ip(req)}`)) {
+      log(`[sikkerhed] kb-soeg-loft ip=${ip(req)}`);
+      res.setHeader('Retry-After', '60');
+      return fejl(res, 429, 'For mange søgninger på kort tid. Vent et minut, og prøv igen.');
+    }
     const tekst = u.searchParams.get('q') || '';
     try {
       const svar = await genesys.soeg(tekst, { antal: 10 });

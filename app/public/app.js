@@ -1,6 +1,6 @@
 'use strict';
 /* GENERERET FIL - redigér app/parts/p*.js og koer build_rune.py.
- * Samlet af 6 dele til version 1. */
+ * Samlet af 6 dele til version 2. */
 
 /* ===== p1_core.js ===== */
 /*
@@ -12,7 +12,7 @@
  * Versionen bor ÉT sted: konstanten herunder. Build'et laeser den og stempler
  * den paa runens `version:` og paa ?v=-adresserne i index.html.
  */
-const APP_VERSION = 1;
+const APP_VERSION = 2;
 
 /* Al tilstand ét sted. `data` er svaret fra /api/admin/data - den er
  * sandheden, og alt tegnes ud fra den. */
