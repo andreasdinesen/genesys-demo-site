@@ -255,6 +255,7 @@ function tjekTrae(mappe, version) {
     'server.js',
     'genesys.js',
     'kb.js',
+    'klientip.js',
     'sider.js',
     'public/index.html',
     'public/app.js',

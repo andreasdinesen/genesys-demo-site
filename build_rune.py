@@ -488,6 +488,7 @@ def main():
              + ['app/public/index.html', 'app/public/app.js',
                 'app/public/style.css', 'app/public/site.css', 'app/public/site.js'])
     for navn in ['app/server.js', 'app/kilde.js', 'app/genesys.js', 'app/kb.js', 'app/sider.js',
+                 'app/klientip.js',
                  'app/public/icon-192.png', 'app/public/icon-512.png']:
         if not os.path.exists(os.path.join(ROD, navn)):
             fejl(f'{navn} mangler')

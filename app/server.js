@@ -26,6 +26,7 @@ const { DatabaseSync } = require('node:sqlite');
 const sider = require('./sider.js');
 const hentIndUdefra = require('./import.js');
 const genesysModul = require('./genesys.js');
+const { klientIp } = require('./klientip.js');
 
 const BIND_PORT = parseInt(process.env.BIND_PORT || '3000', 10);
 const DATA_DIR = process.env.DATA_DIR || process.cwd();
@@ -352,9 +353,10 @@ setInterval(() => {
     if (!liste.some((t) => nu - t < KB_SOEG_VINDUE)) soegninger.delete(k);
   }
 }, 5 * 60e3).unref();
+/* Aldrig den foerste vaerdi i X-Forwarded-For: den vaelger klienten selv, og
+ * saa kunne baade loftet og login-spaerringen omgaas (app/klientip.js). */
 function ip(req) {
-  return String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()
-    || req.socket.remoteAddress || 'ukendt';
+  return klientIp(req);
 }
 
 /* --------------------------------------------------------------------- laasen */
